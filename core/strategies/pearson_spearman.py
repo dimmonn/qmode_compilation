@@ -14,7 +14,6 @@ class PearsonSpearmanCorrelation(AnalysisStrategy):
                 valid_data = data[[feature, target]].dropna()
                 if valid_data.empty:
                     continue
-
                 pearson_corr, pearson_p = pearsonr(valid_data[feature], valid_data[target])
                 spearman_corr, spearman_p = spearmanr(valid_data[feature], valid_data[target])
 
@@ -43,5 +42,17 @@ class PearsonSpearmanCorrelation(AnalysisStrategy):
                 plt.xlabel(feature)
                 plt.ylabel(target)
                 plt.title(f'Impact of {feature} on {target}')
+                plt.tight_layout()
+                plt.show()
+
+    def _scatterplot_matrix(self, data, features, targets):
+        for target in targets:
+            for feature in features:
+                plt.figure(figsize=(8, 5))
+                sns.scatterplot(x=data[feature], y=data[target], alpha=0.5)
+                sns.regplot(x=data[feature], y=data[target], scatter=False, color='red', ci=None)
+                plt.xlabel(feature)
+                plt.ylabel(target)
+                plt.title(f'{feature} vs {target}')
                 plt.tight_layout()
                 plt.show()

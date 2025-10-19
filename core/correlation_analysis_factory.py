@@ -31,7 +31,7 @@ class AnalysisStrategy(ABC):
                 plt.tight_layout()
                 plt.show()
 
-    def visualize_correlation(self, data, features, targets, results):
+    def visualize_correlation(self, features, targets, results):
         """
         Visualizes Pearson & Spearman Correlation results.
         """

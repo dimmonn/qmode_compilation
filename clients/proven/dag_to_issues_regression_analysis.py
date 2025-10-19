@@ -8,47 +8,62 @@ import matplotlib.pyplot as plt
 
 from persistence.DataCacheHandler import DataCacheHandler
 
-data_handler = DataCacheHandler('../../queries/dag_to_issues_prs_future_avg.sql',
-                                '../persistence/files/dag_to_quality.parquet')
-data = None
-try:
-    data = data_handler.load_from_parquet()
-    print("Data loaded successfully!")
-    print(data.head())
-except Exception as e:
-    print(f"Error loading data: {e}")
+from core.factories.analysis_factory import AnalysisFactory
+from persistence.DataCacheHandler import DataCacheHandler
 
-# Fill NaN values with 0 for correlation analysis
-data.fillna(0, inplace=True)
+from core.factories.analysis_factory import AnalysisFactory
+from persistence.DataCacheHandler import DataCacheHandler
 
-# Define features (graph properties) and targets (quality metrics)
-features = ['max_commit_depth',
-            'min_commit_depth',
-            'avg_degree',
-            'max_degree',
-            'max_branches',
-            'max_edges',
-            'max_vertices',
-            'max_files_changed'
-            ]
-targets = ['avg_issue_resolution_time_days', 'avg_pr_review_time_days', 'num_of_prs_opened_after_commit_date',
-           'num_of_issues_opened_after_commit_date']
+from core.factories.analysis_factory import AnalysisFactory
+from persistence.DataCacheHandler import DataCacheHandler
 
-X = data[features]
-y = data[targets]
 
-# Add constant for intercept
-X = sm.add_constant(X)
+class DagRegressionAnalisys:
+    def __init__(self):
+        data_handler = DataCacheHandler('../../queries/dag_to_issues_prs_future_avg.sql',
+                                        '../persistence/files/dag_to_quality.parquet')
 
-# Fit the regression model
+        self.data = data_handler.load_from_parquet()
+        self.data.fillna(0, inplace=True)
+        self.features = ['max_commit_depth',
+                         'min_commit_depth',
+                         'avg_degree',
+                         'max_degree',
+                         'max_branches',
+                         'max_edges',
+                         'max_vertices',
+                         'max_files_changed'
+                         ]
+        self.targets = ['avg_issue_resolution_time_days', 'avg_pr_review_time_days',
+                        'num_of_prs_opened_after_commit_date',
+                        'num_of_issues_opened_after_commit_date']
 
-# for target in targets:
-#     y = data[target]  # Select one target at a time
-#     model = sm.OLS(y, X).fit()
-#     print(f"\nRegression results for: {target}")
-#     print(model.summary())
+        self.strategy_name = "pearson_spearman"
+        self.analysis_strategy = AnalysisFactory.get_analysis(strategy_name)
 
-vif_data = pd.DataFrame()
-vif_data["feature"] = X.columns
-vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
-print(vif_data)
+    def run(self):
+        return self.analysis_strategy.analyze(data=self.data, features=self.features, targets=self.targets)
+
+    def visualize(self, correlation_results):
+        self.analysis_strategy.visualize_correlation(features=features, results=correlation_results)
+
+
+def main():
+    model = DagRegressionAnalisys()
+
+    X = model.data[model.features]
+    y = model.data[model.targets]
+    # for target in targets:
+    #     y = data[target]  # Select one target at a time
+    #     model = sm.OLS(y, X).fit()
+    #     print(f"\nRegression results for: {target}")
+    #     print(model.summary())
+
+    vif_data = pd.DataFrame()
+    vif_data["feature"] = X.columns
+    vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+    print(vif_data)
+
+
+if __name__ == "__main__":
+    main()

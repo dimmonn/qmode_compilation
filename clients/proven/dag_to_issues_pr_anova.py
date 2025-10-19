@@ -1,35 +1,43 @@
 from core.factories.analysis_factory import AnalysisFactory
 from persistence.DataCacheHandler import DataCacheHandler
 
-data_handler = DataCacheHandler('../../queries/dag_to_issues_prs_future_avg.sql',
-                                '../../persistence/files/dag_to_quality.parquet')
 
-data = data_handler.load_from_parquet()
-print("Data loaded successfully!")
-print(data.head())
+class DagToIssuesPrAnova:
+    def __init__(self):
+        data_handler = DataCacheHandler('../../queries/dag_to_issues_prs_future_avg.sql',
+                                        '../../persistence/files/dag_to_quality.parquet')
 
-# Fill NaN values with 0 for correlation analysis
-data.fillna(0, inplace=True)
+        self.data = data_handler.load_from_parquet()
+        self.data.fillna(0, inplace=True)
+        self.features = [
+            'commitCount',
+            'max_commit_depth',
+            'min_commit_depth',
+            'avg_degree',
+            'max_degree',
+            'max_branches',
+            'max_edges',
+            'max_vertices',
+            'max_files_changed'
+        ]
+        self.targets = ['avg_issue_resolution_time_days', 'avg_pr_review_time_days',
+                        'num_of_prs_opened_after_commit_date',
+                        'num_of_issues_opened_after_commit_date']
+        self.strategy_name = "anova"
+        self.analysis_strategy = AnalysisFactory.get_analysis(strategy_name)
 
-# Define features (graph properties) and targets (quality metrics)
-features = [
-    'commitCount',
-    'max_commit_depth',
-    'min_commit_depth',
-    'avg_degree',
-    'max_degree',
-    'max_branches',
-    'max_edges',
-    'max_vertices',
-    'max_files_changed'
-]
-targets = ['avg_issue_resolution_time_days', 'avg_pr_review_time_days', 'num_of_prs_opened_after_commit_date',
-           'num_of_issues_opened_after_commit_date']
+    def run(self):
+        return self.analysis_strategy.analyze(data=self.data, features=self.features, targets=self.targets)
 
-strategy_name = "anova"  # Change as needed
-analysis_strategy = AnalysisFactory.get_analysis(strategy_name)
+    def visualize(self, correlation_results):
+        self.analysis_strategy.visualize_anova(features=features, results=correlation_results)
 
-correlation_results = analysis_strategy.analyze(data=data, features=features, targets=targets)
-# analysis_strategy.generic_visualization(data=data, features=features, targets=targets)
-print(correlation_results)
-analysis_strategy.visualize_anova(features=features, results=correlation_results)
+
+def main():
+    model = DagToIssuesPrAnova()
+    correlation_results = model.run()
+    model.visualize(correlation_results=correlation_results)
+
+
+if __name__ == "__main__":
+    main()

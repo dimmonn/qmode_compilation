@@ -1,12 +1,12 @@
 import pandas as pd
+from pandas import DataFrame
 from sqlalchemy import create_engine
 import os
-
 
 class DataCacheHandler:
     def __init__(self, sql_file_path, data_file_path):
         self.db_config = {
-            "username": "admin",
+            "username": "root",
             "password": "admin",
             "host": "localhost",
             "port": "3307",
@@ -72,7 +72,7 @@ class DataCacheHandler:
             self.save_to_csv(self.file_path)
             return pd.read_csv(self.file_path)
 
-    def load_from_parquet(self):
+    def load_from_parquet(self) -> DataFrame:
         """Load data from a Parquet file."""
         if os.path.exists(self.file_path):
             return pd.read_parquet(self.file_path)
