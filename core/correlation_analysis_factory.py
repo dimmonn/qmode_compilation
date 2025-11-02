@@ -3,8 +3,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-# Strategy Interface
 class AnalysisStrategy(ABC):
     @abstractmethod
     def analyze(self, data, features, targets):
@@ -20,7 +18,6 @@ class AnalysisStrategy(ABC):
         plt.tight_layout()
         plt.show()
 
-        # Create scatter plots with regression lines for each feature vs quality metric
         for target in targets:
             for feature in features:
                 plt.figure(figsize=(8, 5))
@@ -32,10 +29,6 @@ class AnalysisStrategy(ABC):
                 plt.show()
 
     def visualize_correlation(self, features, targets, results):
-        """
-        Visualizes Pearson & Spearman Correlation results.
-        """
-        # Convert to DataFrame for heatmap visualization
         pearson_corr_df = pd.DataFrame({
             target: {feature: results[target][feature]['pearson_corr'] for feature in features} for target in targets
         })
@@ -69,9 +62,7 @@ class AnalysisStrategy(ABC):
         explained_variance = results["explained_variance"]
         principal_components = results["principal_components"]
         loadings = results["loadings"]
-        features = results["features"]  # Now we have the features list
-
-        # Scree Plot
+        features = results["features"]
         plt.figure(figsize=(8, 5))
         plt.bar(range(1, len(explained_variance) + 1), explained_variance, color='blue', alpha=0.7)
         plt.xlabel('Principal Component')
@@ -81,7 +72,6 @@ class AnalysisStrategy(ABC):
         plt.tight_layout()
         plt.show()
 
-        # 2D Scatter Plot of the first 2 Principal Components
         if principal_components.shape[1] >= 2:
             plt.figure(figsize=(8, 5))
             plt.scatter(principal_components[:, 0], principal_components[:, 1], alpha=0.5, edgecolors='k')
@@ -91,9 +81,7 @@ class AnalysisStrategy(ABC):
             plt.tight_layout()
             plt.show()
 
-        # Plot the loadings of features for PC1 and PC2 (top 2 components)
         if loadings.shape[0] >= 2:
-            # PC1 Loadings
             plt.figure(figsize=(8, 5))
             plt.barh(features, loadings[0], color='green', alpha=0.7)
             plt.xlabel("Loading Value")
@@ -102,7 +90,6 @@ class AnalysisStrategy(ABC):
             plt.tight_layout()
             plt.show()
 
-            # PC2 Loadings
             plt.figure(figsize=(8, 5))
             plt.barh(features, loadings[1], color='orange', alpha=0.7)
             plt.xlabel("Loading Value")

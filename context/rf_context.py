@@ -1,6 +1,6 @@
 from pandas import DataFrame
 
-from strategies.random_forest import RandomForestAnalysis
+from core.strategies.random_forest import RandomForestAnalysis
 
 
 class RfContext:

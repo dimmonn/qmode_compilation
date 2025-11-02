@@ -2,7 +2,7 @@ from core.strategies.anova import ANOVAAnalysis
 from core.strategies.pca import PCAAnalysis
 from core.strategies.pearson_spearman import PearsonSpearmanCorrelation
 from core.strategies.linear_regression import LinearRegressionAnalysis
-from strategies.random_forest import RandomForestAnalysis
+from core.strategies.random_forest import RandomForestAnalysis
 from typing import Any
 
 

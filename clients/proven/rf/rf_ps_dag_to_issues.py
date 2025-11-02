@@ -1,6 +1,6 @@
 from persistence.DataCacheHandler import DataCacheHandler
 from context.rf_context import RfContext
-from strategies.random_forest import RandomForestAnalysis
+from core.strategies.random_forest import RandomForestAnalysis
 from core.factories.analysis_factory import AnalysisFactory
 
 

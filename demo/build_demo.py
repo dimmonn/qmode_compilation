@@ -2,9 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from pptx import Presentation
 from pptx.util import Inches
-import os
 
-# Graph structure steps
 steps = [
     {"nodes": ["A"], "edges": []},
     {"nodes": ["B"], "edges": [("A", "B")]},
@@ -12,14 +10,13 @@ steps = [
     {"nodes": ["D"], "edges": [("C", "D")]},
     {"nodes": ["E"], "edges": [("C", "E")]},
     {"nodes": ["F"], "edges": [("E", "F")]},
-    {"nodes": ["G"], "edges": [("D", "G"), ("F", "G")]},  # merge
+    {"nodes": ["G"], "edges": [("D", "G"), ("F", "G")]},
     {"nodes": ["H"], "edges": [("C", "H")]},
     {"nodes": ["I"], "edges": [("H", "I")]},
-    {"nodes": ["J"], "edges": [("G", "J"), ("I", "J")]},  # merge again
+    {"nodes": ["J"], "edges": [("G", "J"), ("I", "J")]},
     {"nodes": ["K"], "edges": [("J", "K")]}
 ]
 
-# Layout positions
 pos = {
     "A": (0, 5),
     "B": (1, 5),
@@ -34,16 +31,15 @@ pos = {
     "K": (6, 3.5),
 }
 
-# Commit branch colors
 node_colors = {
     "A": "gray",
     "B": "gray",
-    "C": "orange",  # feature
+    "C": "orange",
     "D": "orange",
-    "E": "blue",  # dev
+    "E": "blue",
     "F": "blue",
     "G": "blue",
-    "H": "red",  # hotfix
+    "H": "red",
     "I": "red",
     "J": "green",  # release
     "K": "green"
@@ -125,7 +121,6 @@ for i, step in enumerate(steps):
     # Display step and node info
     plt.title(f"Step {i + 1}: Adding {', '.join(step['nodes'])}", fontsize=14)
 
-    # Add metrics as text box on the figure
     metrics_text = "\n".join([
         f"Vertices: {metrics['numberOfVertices']}",
         f"Edges: {metrics['numberOfEdges']}",
