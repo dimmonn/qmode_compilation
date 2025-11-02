@@ -31,10 +31,6 @@ class PearsonSpearmanCorrelation(AnalysisStrategy):
         return correlation_results
 
     def generic_visualization(self, data, features, targets):
-        """
-        Visualizes Pearson & Spearman Correlation results.
-        """
-        # Convert to DataFrame for heatmap visualization
         for target in targets:
             for feature in features:
                 plt.figure(figsize=(8, 5))

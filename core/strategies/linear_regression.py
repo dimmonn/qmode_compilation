@@ -34,7 +34,6 @@ class LinearRegressionAnalysis(AnalysisStrategy):
             plt.figure(figsize=(10, 5))
             ax = sns.barplot(x='feature', y='coefficient', data=df, palette='coolwarm')
 
-            # Annotate p-values
             for i, row in df.iterrows():
                 significance = ''
                 if row['p_value'] < 0.001:
