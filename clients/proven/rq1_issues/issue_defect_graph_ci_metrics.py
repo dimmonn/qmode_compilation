@@ -3,18 +3,6 @@ from persistence.DataCacheHandler import DataCacheHandler
 
 
 class DagToIssuesPrPearsonRQ1:
-    """
-    RQ1: How do commit-graph metrics relate to issue resolution time?
-
-    One row = one issue × one fixing commit (before grouping).
-    The SQL already aggregates graph/CI metrics PER ISSUE.
-
-    Target:
-        issue_resolution_hours
-
-    Features:
-        Graph metrics, patch size, CI metrics aggregated over fixing commits.
-    """
 
     def __init__(self, project_owner: str):
         self.project_owner = project_owner
@@ -65,7 +53,7 @@ class DagToIssuesPrPearsonRQ1:
         self.analysis_strategy = AnalysisFactory.get_analysis(self.strategy_name)
 
     def run(self):
-        """Run Pearson + Spearman correlation for RQ1."""
+
         return self.analysis_strategy.analyze(
             data=self.data,
             features=self.features,
@@ -73,7 +61,7 @@ class DagToIssuesPrPearsonRQ1:
         )
 
     def visualize(self, correlation_results):
-        """Visualize correlations."""
+
         self.analysis_strategy.visualize_correlation(
             features=self.features,
             targets=self.targets,

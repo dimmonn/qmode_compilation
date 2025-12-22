@@ -72,12 +72,7 @@ class AnalysisStrategy(ABC):
         plt.show()
 
     def visualize_pca(self, results):
-        """
-        Visualizes PCA results:
-        1. Scree Plot for explained variance.
-        2. 2D scatter plot of the first two principal components (if available).
-        3. Feature loadings for the first two principal components.
-        """
+
         explained_variance = results["explained_variance"]
         principal_components = results["principal_components"]
         loadings = results["loadings"]
@@ -118,9 +113,7 @@ class AnalysisStrategy(ABC):
             plt.show()
 
     def visualize_anova(self, features, results):
-        """
-        Visualizes ANOVA results using bar plots.
-        """
+
         f_stats = {
             target: [results[target][feature]['f_stat'] if feature in results[target] else 0 for feature in features]
             for target in results}

@@ -4,25 +4,6 @@ from persistence.DataCacheHandler import DataCacheHandler
 
 
 class IssueDefectRQ3Models:
-    """
-    RQ3 (defect side only):
-
-        To what extent can graph and churn metrics of
-        bug-introducing commits (that belong to PRs)
-        explain issue resolution time?
-
-    SQL:
-        ../../../queries/issue_rq3_defect_graph_churn_pr_commits.sql
-
-    One row = one closed issue.
-    Only SZZ bug-introducing commits with commit.pr_id > 0 are used.
-
-    Target:
-        log_issue_resolution_hours  (log1p of hours, for heavy tails)
-
-    Features:
-        All bic_* graph and churn metrics from the SQL above.
-    """
 
     def __init__(self, project_owner: str):
         self.project_owner = project_owner
@@ -90,10 +71,7 @@ class IssueDefectRQ3Models:
         )
 
     def _ensure_dataset_split(self):
-        """
-        RandomForestAnalysis expects a 'dataset_split' column with values
-        'train' / 'validation'. If it's missing, create an 80/20 split.
-        """
+
         if 'dataset_split' not in self.data.columns:
             rng = np.random.default_rng(42)
             mask = rng.random(len(self.data)) < 0.8
