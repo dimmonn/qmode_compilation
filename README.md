@@ -1,77 +1,280 @@
-## 1. Correlation Analysis (Pearson & Spearman)
+# qmodel_compilation
 
-### Highly Correlated Features (Strong Positive Correlation, r > 0.5)
+This repository contains the compiled analysis pipeline and results for a quantitative study on the relationship between commit graph structure, code churn, and software process outcomes, with a focus on issues, pull requests, and defect-introducing commits.
 
-- **avg_degree vs. avg_issue_resolution_time_days**
-  - Pearson: 0.4988
-  - Spearman: 0.5318
-
-- **max_degree vs. avg_pr_review_time_days**
-  - Pearson: 0.5749
-  - Spearman: 0.5170
-
-- **max_commit_depth vs. num_of_prs_opened_after_commit_date**
-  - Pearson: 0.5765
-  - Spearman: 0.4732
-
-- **max_degree vs. num_of_prs_opened_after_commit_date**
-  - Pearson: 0.7536
-  - Spearman: 0.5625
-
-- **max_degree vs. num_of_issues_opened_after_commit_date**
-  - Pearson: 0.7799
-  - Spearman: 0.6598
-![img.png](img.png)
-![img_1.png](img_1.png)
-#### Interpretation:
-- Higher complexity in commit structures (max_commit_depth, max_degree, avg_degree) is strongly associated with longer issue resolution times and higher PR review times.
-- More interconnected commit graphs (higher max_degree) correspond with more PRs and issues being opened after commit dates.
-- The number of branches (`max_branches`) and number of edges (`max_edges`) are also positively correlated with issue and PR-related metrics.
-
-### Negative Correlations
-
-- **max_files_changed** has a weak negative correlation with most targets.
-
-#### Interpretation:
-- More changed files per commit might lead to faster issue resolution and PR review times, possibly because large commits are better structured or contain fixes for multiple issues.
-
-### Low or Insignificant Correlations
-
-- **min_commit_depth** shows weak correlation with issue resolution time.
-  - Pearson: -0.0151
-  - Spearman: 0.2335
-
-#### Interpretation:
-- The shallowest commit in a branch may not play a strong role in determining issue resolution speed.
+The implementation supports three research questions (RQ1–RQ3) and applies graph-based metrics, churn metrics, and statistical / machine-learning models to real-world GitHub projects (e.g., Ansible, Facebook).
 
 ---
 
-## 2. Principal Component Analysis (PCA)
+## Research Questions
 
-### Explained Variance
+### RQ1 — Commit DAG vs. Issue Resolution
 
-- **First component** explains 96.5% of variance, suggesting that most of the information is captured in the first principal component.
-- **Second component** explains 2.1%.
-- **Third component** explains 1.2%.
+To what extent are structural properties of the commit DAG associated with issue-level outcomes?
 
-#### Interpretation:
-- Most of the variability in the dataset comes from one dominant factor, possibly related to overall commit complexity (e.g., `max_commit_depth`, `max_degree`).
-![img_4.png](img_4.png)
-![img_5.png](img_5.png)
-![img_6.png](img_6.png)
-![img_7.png](img_7.png)
----
+This research question evaluates correlations between commit-graph metrics and issue resolution time using Pearson and Spearman correlation analysis.
 
-## 3. ANOVA Results
-
-### Significant Features
-
-- Features like `commitCount`, `max_commit_depth`, `min_commit_depth`, and `max_degree` have statistically significant effects (p-value ≈ 0.0) on targets.
-
-#### Interpretation:
-- Variations in these features significantly impact quality metrics, meaning different levels of these features result in substantial differences in issue resolution times, PR review times, and issue/PR creation rates.
-{'avg_issue_resolution_time_days': {'commitCount': {'f_stat': 28.704490661496067, 'p_value': 0.0}, 'max_commit_depth': {'f_stat': 2.3274487056310424, 'p_value': 1.0467345097158141e-292}, 'min_commit_depth': {'f_stat': 4.906687834845193, 'p_value': 0.0}, 'avg_degree': {'f_stat': 6.222406352104617, 'p_value': 9.184265583587966e-06}, 'max_degree': {'f_stat': 1379.5823224270805, 'p_value': 0.0}, 'max_branches': {'f_stat': 202.4949924321311, 'p_value': 0.0}, 'max_edges': {'f_stat': 2.755951729047579, 'p_value': 0.0}, 'max_vertices': {'f_stat': 2.9475996251948073, 'p_value': 0.0}, 'max_files_changed': {'f_stat': 1.8213671879490752, 'p_value': 4.5415202299800203e-14}}, 'avg_pr_review_time_days': {'commitCount': {'f_stat': 5.443260107572381, 'p_value': 2.2025277367055844e-54}, 'max_commit_depth': {'f_stat': 2.9226694447011816, 'p_value': 0.0}, 'min_commit_depth': {'f_stat': 3.9941132121580813, 'p_value': 0.0}, 'avg_degree': {'f_stat': 36.569242264791434, 'p_value': 4.6042884417116744e-37}, 'max_degree': {'f_stat': 3315.524530415224, 'p_value': 0.0}, 'max_branches': {'f_stat': 179.2550535167993, 'p_value': 0.0}, 'max_edges': {'f_stat': 3.0066117115915776, 'p_value': 0.0}, 'max_vertices': {'f_stat': 3.471454552857606, 'p_value': 0.0}, 'max_files_changed': {'f_stat': 1.2347733012395612, 'p_value': 0.006741779216865787}}, 'num_of_prs_opened_after_commit_date': {'commitCount': {'f_stat': 36.303450629712174, 'p_value': 0.0}, 'max_commit_depth': {'f_stat': 2.7869613357310437, 'p_value': 0.0}, 'min_commit_depth': {'f_stat': 5.041415644130419, 'p_value': 0.0}, 'avg_degree': {'f_stat': 97.26044544071782, 'p_value': 4.56178038418239e-99}, 'max_degree': {'f_stat': 3590.2637306192805, 'p_value': 0.0}, 'max_branches': {'f_stat': 248.16004102393597, 'p_value': 0.0}, 'max_edges': {'f_stat': 2.890856024529561, 'p_value': 0.0}, 'max_vertices': {'f_stat': 4.2153660922094, 'p_value': 0.0}, 'max_files_changed': {'f_stat': 1.4780506056675822, 'p_value': 1.3425382266476645e-06}}, 'num_of_issues_opened_after_commit_date': {'commitCount': {'f_stat': 34.163965473343566, 'p_value': 0.0}, 'max_commit_depth': {'f_stat': 2.863938592071896, 'p_value': 0.0}, 'min_commit_depth': {'f_stat': 5.381551170963526, 'p_value': 0.0}, 'avg_degree': {'f_stat': 113.35733371040423, 'p_value': 4.092346137289233e-115}, 'max_degree': {'f_stat': 3899.3834003027328, 'p_value': 0.0}, 'max_branches': {'f_stat': 302.9449423249188, 'p_value': 0.0}, 'max_edges': {'f_stat': 2.969969858198799, 'p_value': 0.0}, 'max_vertices': {'f_stat': 4.173617439232531, 'p_value': 0.0}, 'max_files_changed': {'f_stat': 1.6927436401245186, 'p_value': 5.1362118749415003e-11}}}
-![img_8.png](img_8.png)
-![img_9.png](img_9.png)
+Implemented in:
+- `DagToIssuesPrPearsonRQ1`
 
 ---
+
+### RQ2 — Commit DAG vs. Pull Request Characteristics
+
+How do commit DAG characteristics relate to pull-request properties?
+
+This research question analyzes correlations between commit-graph metrics and pull-request–level characteristics.
+
+Implemented in:
+- `DagToPrrPearsonRQ2`
+
+---
+
+### RQ3 — Defect-Side Explanation of Issue Resolution Time
+
+To what extent can graph and churn metrics of bug-introducing commits explain issue resolution time?
+
+This research question models issue resolution time as a function of graph-based and churn-based metrics extracted from SZZ-identified bug-introducing commits that belong to pull requests.
+
+Implemented in:
+- `IssueDefectRQ3Models`
+
+---
+
+## Data Model
+
+### Unit of Analysis
+
+- One row corresponds to one closed issue
+- Only issues linked to SZZ-identified bug-introducing commits are included
+- Only bug-introducing commits with `pr_id > 0` (i.e., belonging to a pull request) are used
+
+---
+
+### Target Variable
+
+- `log_issue_resolution_hours`
+
+The target is defined as:
+log_issue_resolution_hours = log(1 + issue_resolution_hours)
+
+
+The logarithmic transformation mitigates heavy-tailed distributions in issue resolution time.
+
+---
+
+## Features
+
+All features describe properties of bug-introducing commits and are prefixed with `bic_`.
+
+### Graph-Based Metrics
+
+- `bic_num_commits`
+- `bic_avg_depth_diff`
+- `bic_max_depth_diff`
+- `bic_avg_fp_distance`
+- `bic_max_fp_distance`
+- `bic_avg_upstream_heads`
+- `bic_max_upstream_heads`
+- `bic_avg_in_degree`
+- `bic_avg_out_degree`
+- `bic_avg_branches`
+- `bic_avg_average_degree`
+- `bic_avg_days_since_merge`
+- `bic_max_days_since_merge`
+
+---
+
+### Churn Metrics
+
+- `bic_total_additions`
+- `bic_total_deletions`
+- `bic_total_changes`
+- `bic_avg_changes_per_file`
+- `bic_max_changes_in_file`
+- `bic_num_files_changed`
+- `bic_change_density_per_file`
+- `bic_avg_branch_commit_rate`
+
+---
+
+## Methods
+
+### Correlation Analysis (RQ1, RQ2)
+
+- Pearson correlation
+- Spearman rank correlation (robustness check)
+- Results visualized using correlation heatmaps
+
+---
+
+### Linear Regression (RQ3)
+
+- Ordinary Least Squares (OLS)
+- Features are standardized (z-score normalization)
+- Intercept included
+- Coefficients interpreted as standardized effects
+- Statistical significance assessed using p-values
+
+Outputs include:
+- Regression coefficients
+- Significance annotations
+- Residual distributions
+- Actual vs. predicted plots
+
+---
+
+### Random Forest Regression (RQ3)
+
+- Non-linear regression baseline
+- 80/20 train–validation split
+- Metrics:
+  - R² (explained variance)
+  - Mean Squared Error (MSE)
+
+Outputs include:
+- Feature importance rankings
+- Actual vs. predicted plots
+- Residual histograms
+
+---
+
+## Partial Results (Illustrative)
+
+- Commit graph depth metrics (e.g., `bic_max_depth_diff`) consistently show the strongest association with issue resolution time.
+- Churn-related metrics exhibit moderate monotonic relationships, more visible under Spearman correlation.
+- Linear regression and random forest models yield consistent rankings of influential features.
+- Models explain a non-trivial but incomplete fraction of the variance in issue resolution time.
+
+---
+
+## Code Structure
+```aiignore
+ tree            
+        
+.
+├── README.md
+├── __init__.py
+├── clients
+│            ├── __init__.py
+│            └── proven
+│                ├── __init__.py
+│                ├── bid_to_issues_pca.py
+│                ├── bid_to_issues_pr_anova.py
+│                ├── bid_to_issues_regression.py
+│                ├── chorn_to_issues_pr_anova.py
+│                ├── chorn_to_issues_pr_pca.py
+│                ├── chorn_to_issues_pr_pearson.py
+│                ├── dag_to_issues_pr_anova.py
+│                ├── dag_to_issues_pr_pca.py
+│                ├── dag_to_issues_pr_pearson.py
+│                ├── dag_to_issues_regression_analysis.py
+│                ├── lr
+│                │            ├── RpbustAnalysis.py
+│                │            └── lr_file_change_complexity_vs_issue_pr_time.py
+│                ├── ps
+│                │            ├── ps_dag_to_issues.py
+│                │            ├── ps_dev_workload_vs_issues_time.py
+│                │            ├── ps_dev_workload_vs_pr_time.py
+│                │            ├── ps_developer_inactivity_to_issues_pr.py
+│                │            └── ps_file_change_complexity_vs_issue_pr_time.py
+│                ├── rf
+│                │            ├── rf_developer_inactivity_to_issues_pr.py
+│                │            ├── rf_file_change_complexity_vs_issue_pr_time.py
+│                │            └── rf_ps_dag_to_issues.py
+│                ├── rq1_issues
+│                │            ├── issue_defect_graph_ci_metrics.py
+│                │            └── issue_fix_graph_ci_metrics.py
+│                ├── rq2_pr
+│                │            ├── __init__.py
+│                │            ├── pr_defect_graph_ci_metrics.py
+│                │            └── pr_fix_graph_ci_metrics.py
+│                └── rq3
+│                    ├── __init__.py
+│                    └── issue_RQ3_models.py
+├── context
+│            ├── LrContext.py
+│            ├── PsContext.py
+│            ├── __init__.py
+│            └── rf_context.py
+├── core
+│            ├── __init__.py
+│            ├── __pycache__
+│            │            └── correlation_analysis_factory.cpython-311.pyc
+│            ├── correlation_analysis_factory.py
+│            ├── factories
+│            │            ├── __init__.py
+│            │            ├── __pycache__
+│            │            │            └── analysis_factory.cpython-311.pyc
+│            │            └── analysis_factory.py
+│            └── strategies
+│                ├── __init__.py
+│                ├── __pycache__
+│                │            ├── anova.cpython-311.pyc
+│                │            ├── pca.cpython-311.pyc
+│                │            └── pearson_spearman.cpython-311.pyc
+│                ├── anova.py
+│                ├── linear_regression.py
+│                ├── pca.py
+│                ├── pearson_spearman.py
+│                └── random_forest.py
+├── demo
+│            └── build_demo.py
+├── persistence
+│            ├── DataCacheHandler.py
+│            ├── __init__.py
+│            ├── __pycache__
+│            │            └── DataCacheHandler.cpython-311.pyc
+│            └── files
+│                ├── issue_defect_graph_ci_metrics_ansible.parquet
+│                ├── issue_defect_graph_ci_metrics_facebook.parquet
+│                ├── issue_rq3_defect_graph_churn_pr_commits_ansible.parquet
+│                ├── issue_rq3_defect_graph_churn_pr_commits_facebook.parquet
+│                ├── pull_defect_graph_ci_metrics_ansible.parquet
+│                └── pull_defect_graph_ci_metrics_facebook.parquet
+├── populate_name_owner.py
+├── queries
+│            ├── __init__.py
+│            ├── bug_commits_to_issues.sql
+│            ├── bug_commits_to_pr.sql
+│            ├── bug_introduced_defects_to_issues.sql
+│            ├── churn_to_issues_prs_future_avg.sql
+│            ├── dag_to_issues_prs_future_avg.sql
+│            ├── issue_defect_graph_ci_metrics.sql
+│            ├── pull_defect_graph_ci_metrics.sql
+│            └── sp
+│                ├── dag_to_issues.sql
+│                ├── dev_workload_vs_issues_time.sql
+│                ├── dev_workload_vs_pr_time.sql
+│                ├── developer_inactivity_to_issues_pr.sql
+│                ├── file_change_complexity_vs_issue_pr_time.sql
+│                ├── labels_to_issue.sql
+│                └── labels_to_pr.sql
+└── requirements.txt
+
+
+```
+
+
+---
+
+## Notes on Metric Interpretation
+
+Some metrics (e.g., `bic_avg_branches`) may be zero for a large fraction of observations due to branch deletion or merge policies in Git workflows. These metrics are retained for completeness but should be interpreted with caution.
+
+Future work may redefine such metrics to better capture structural branching exposure, for example by counting distinct downstream splits observed by a commit.
+
+---
+
+## Reproducibility
+
+- Analyses are deterministic where applicable (fixed random seeds)
+- Results are reproducible given the same underlying dataset
+- All visualization functions are included in the repository
+
+---
+
+## License
+
+Specify license here.
+
